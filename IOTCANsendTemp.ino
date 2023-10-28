@@ -1,5 +1,6 @@
 #include <ESP32CAN.h>
 #include <CAN_config.h>
+
 #define DHpin  A8 // ESP32 pin GPIO21 connected to DHT11 sensor
 /* the variable name CAN_cfg is fixed, do not change */
 CAN_device_t CAN_cfg;
@@ -21,8 +22,13 @@ void setup() {
 
 void loop() {
     CAN_frame_t rx_frame;
-    //unsigned int temp = analogRead(DHpin);
-    //temp = (byte)temp;
+    unsigned int temp = analogRead(DHpin);
+    temp = (byte)temp;
+
+    uint8_t digit1 = temp / 100;
+    uint8_t digit2 = (temp / 10) % 10;
+    uint8_t digit3 = temp % 10;
+
     //Serial.println(temp);
     //receive next CAN frame from queue
     if(xQueueReceive(CAN_cfg.rx_queue,&rx_frame, 3*portTICK_PERIOD_MS)==pdTRUE){
@@ -37,7 +43,7 @@ void loop() {
         printf(" RTR from 0x%08x, DLC %d\r\n",rx_frame.MsgID,  rx_frame.FIR.B.DLC);
       else{
         printf(" from 0x%08x, DLC %d\n",rx_frame.MsgID,  rx_frame.FIR.B.DLC);
-        for(int i = 0; i < 8; i++){
+        for(int i = 0; i < 1; i++){
           printf("%c\t", (char)rx_frame.data.u8[i]);
         }
         printf("\n");
@@ -46,21 +52,29 @@ void loop() {
     else
     {
       rx_frame.FIR.B.FF = CAN_frame_std;
-      rx_frame.MsgID = 10;
+      rx_frame.MsgID = 1;
       rx_frame.FIR.B.DLC = 8;
-      //rx_frame.data.u8[0] = temp;
-      rx_frame.data.u8[0] = 'h'; 
-      rx_frame.data.u8[1] = 'e';
-      rx_frame.data.u8[2] = 'l';
-      rx_frame.data.u8[3] = 'l';
-      rx_frame.data.u8[4] = 'o';
-      rx_frame.data.u8[5] = 'c';
-      rx_frame.data.u8[6] = 'a';
-      rx_frame.data.u8[7] = 'n';
-      
+//      rx_frame.data.u8[0] = '1' ;
+//      rx_frame.data.u8[1] = '2'; 
+//      rx_frame.data.u8[2] = '3';
+      rx_frame.data.u8[0] = char(digit1); 
+      rx_frame.data.u8[1] = char(digit2); 
+      rx_frame.data.u8[2] = char(digit3); 
+//      rx_frame.data.u8[2] = 'l';
+//      rx_frame.data.u8[3] = 'l';
+//      rx_frame.data.u8[4] = 'o';
+//      rx_frame.data.u8[5] = 'c';
+//      rx_frame.data.u8[6] = 'a';
+//      rx_frame.data.u8[7] = 'n';
 
       
       ESP32Can.CANWriteFrame(&rx_frame);
       delay(200);
     }
 }
+
+//int conversion(uint_8 data) {
+//  // convert unsigned int to just an integer 
+//  // modulo the number into separate digits 
+//  // put the digits into an integer array 
+//}
