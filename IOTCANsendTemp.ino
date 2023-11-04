@@ -76,12 +76,6 @@ void loop() {
       //delay(200);
     }
 }
-
-//int conversion(uint_8 data) {
-//  // convert unsigned int to just an integer 
-//  // modulo the number into separate digits 
-//  // put the digits into an integer array 
-//}
 //      rx_frame.data.u8[2] = 'l';
 //      rx_frame.data.u8[3] = 'l';
 //      rx_frame.data.u8[4] = 'o';
