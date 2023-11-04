@@ -47,9 +47,13 @@ void loop() {
       char str[rx_frame.FIR.B.DLC];
       for(int i = 0; i < 3; i++){ 
         //printf("%c\t", (char)rx_frame.data.u8[i]);
-        Serial.println(rx_frame.data.u8[i]);
+        //Serial.println(rx_frame.data.u8[i]);
         //sprintf(str, "%d", rx_frame.data.u8[i]);
       }
+      int x = rx_frame.data.u8[0];
+      int y = rx_frame.data.u8[1];
+      int z = rx_frame.data.u8[2];
+      printf("%d%d%d",x,y,z);
       //make function to concat all the separate ints into one in and put it here 
       //Serial.println("data Recieved");
       //printf("%c\t",dataReceived);
@@ -58,7 +62,11 @@ void loop() {
     else {
       //if not receiving, we send data 
       //do this simultaneously? 
-      rx_frame.FIR.B.FF = CAN_frame_std;
+      //rx_frame.FIR.B.FF = CAN_frame_std;
+      //sendTemp();
+
+      CAN_frame_t rx_frame;
+      rx_frame.FIR.B.FF = CAN_frame_std; 
       rx_frame.MsgID = 1;
       rx_frame.FIR.B.DLC = 8;
       rx_frame.data.u8[0] = char(digit1); 
@@ -73,9 +81,34 @@ void loop() {
       Serial.println("-------digit3-------");
       Serial.println(digit3);
       ESP32Can.CANWriteFrame(&rx_frame);
-      //delay(200);
     }
 }
+
+//void sendTemp(){
+//    CAN_frame_t rx_frame;
+//    rx_frame.FIR.B.FF = CAN_frame_std;
+//    rx_frame.MsgID = 1;
+//    rx_frame.FIR.B.DLC = 8;
+//    rx_frame.data.u8[0] = char(digit1); 
+//    rx_frame.data.u8[1] = char(digit2); 
+//    rx_frame.data.u8[2] = char(digit3); 
+//    Serial.println("-------temp-------");
+//    Serial.println(temp);
+//    Serial.println("-------digit1-------");
+//    Serial.println(digit1);
+//    Serial.println("-------digit2-------");
+//    Serial.println(digit2);
+//    Serial.println("-------digit3-------");
+//    Serial.println(digit3);
+//    ESP32Can.CANWriteFrame(&rx_frame);
+//    //delay(200);
+//}
+
+//int conversion(uint_8 data) {
+//  // convert unsigned int to just an integer 
+//  // modulo the number into separate digits 
+//  // put the digits into an integer array 
+//}
 //      rx_frame.data.u8[2] = 'l';
 //      rx_frame.data.u8[3] = 'l';
 //      rx_frame.data.u8[4] = 'o';
