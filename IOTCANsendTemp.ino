@@ -56,10 +56,16 @@ void loop() {
       int x = rx_frame.data.u8[0];
       int y = rx_frame.data.u8[1];
       int z = rx_frame.data.u8[2];
+
+      int a = rx_frame.data.u8[3];
+      int b = rx_frame.data.u8[4];
+      int c = rx_frame.data.u8[5];
+      
+      printf("x values");
       printf("%d%d%d",x,y,z);
-      //make function to concat all the separate ints into one in and put it here 
-      //Serial.println("data Recieved"); 
-      //printf("%c\t",dataReceived);
+      printf("y values");
+      printf("%d%d%d",a,b,c);
+      
     }
    else {
     //sendTemp();
