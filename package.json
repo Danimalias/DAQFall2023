@@ -1,0 +1,19 @@
+{
+  "name": "espee",
+  "version": "1.0.0",
+  "description": "Testing for esp32 to driver dash integration.",
+  "type": "module",
+  "main": "server.js",
+  "scripts": {
+    "start": "node .",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "jklein64",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.18.2",
+    "ip": "^1.1.8",
+    "morgan": "^1.10.0",
+    "ws": "^8.14.2"
+  }
+}
