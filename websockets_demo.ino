@@ -5,6 +5,7 @@
 #include <ArduinoWebsockets.h>
 #include <CAN.h>
 #include <ArduinoJson.h> 
+#include <stdio.h>
 /* the variable name CAN_cfg is fixed, do not change */
 
 CAN_device_t CAN_cfg;
@@ -14,10 +15,14 @@ CAN_device_t CAN_cfg;
 void sendTemp();
 void collectTemp();
 
-const char* ssid = "aditya";
-const char* password = "poupou33";
-const char* websocket_server_host = "192.168.48.214";
+const char* ssid = "Dan";
+const char* password = "muanha21";
+// this IP address is what outputted from node server.js 
+const char* websocket_server_host = "172.20.10.8";
 const uint16_t websocket_server_port = 8080;
+const char* msg = NULL;
+const char* msg1 = NULL;
+
 
 using namespace websockets;
 
@@ -123,7 +128,24 @@ client.poll();
                 Serial.println("Received Data"); 
                 printf("%d%d%d%d%d%d", joystick1, joystick2, joystick3, joystick4, 
                   joystick5, joystick6); 
+                client.send("joystick1 test");
+                std::string strNum1 = std::to_string(joystick1);
+                std::string strNum2 = std::to_string(joystick2);               
+                std::string strNum3 = std::to_string(joystick3);
+                std::string strNum4 = std::to_string(joystick4);
+                std::string strNum5 = std::to_string(joystick5);
+                std::string strNum6 = std::to_string(joystick6);
+                std::string xjoystick = strNum1+strNum2+strNum3;
+                std::string yjoystick = strNum4+strNum5+strNum6;
+                //int var = rx_frame.data.u8;
+                //below works
+                msg = xjoystick.c_str();
+                msg1 = yjoystick.c_str();
+                //msg = std::to_string(xjoystick).c_str();
+                
+                client.send(msg);
                 Serial.println(" "); 
+                client.send(msg1);
               } else if (rx_frame.MsgID == 3) {
                 int data1 = rx_frame.data.u8[0]; 
                 int data2 = rx_frame.data.u8[1]; 
