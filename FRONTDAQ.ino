@@ -29,8 +29,8 @@ int hall_count = 0;
 CAN_device_t CAN_cfg;
 
 // websocket set up 
-const char* ssid = "Dan";
-const char* password = "muanha21";
+const char* ssid = "Dionna";
+const char* password = "dionnaiscool";
 // this IP address is what outputted from node server.js 
 const char* websocket_server_host = "172.20.10.8";
 const uint16_t websocket_server_port = 8080;
@@ -146,7 +146,7 @@ void loop() {
                 printf(" from 0x%08x, DLC %d\n",rx_frame.MsgID,  rx_frame.FIR.B.DLC);
               }
 
-              // print data received: it is from the second RPM sensor for now 
+              // print data received: it is from the temperature sensor for now 
               if (rx_frame.MsgID == 3) {
                 int data1 = rx_frame.data.u8[0]; 
                 int data2 = rx_frame.data.u8[1]; 
@@ -155,16 +155,16 @@ void loop() {
                 int data5 = rx_frame.data.u8[4]; 
                 Serial.println("Received Data"); 
                 printf("%d%d%d%d%d%d", data1, data2, data3, data4, data5); 
-                client.send("Left RPM Data"); 
+                client.send("temp Data"); 
                 std::string strNum1 = std::to_string(data1);
                 std::string strNum2 = std::to_string(data2);               
                 std::string strNum3 = std::to_string(data3);
                 std::string strNum4 = std::to_string(data4);
                 std::string strNum5 = std::to_string(data5);
     
-                std::string leftRPM = strNum1+strNum2+strNum3+strNum4+strNum5;
-                msg = leftRPM.c_str(); 
-                client.send(msg); 
+                std::string temper = strNum1+strNum2+strNum3+strNum4+strNum5;
+                msg1 = temper.c_str(); 
+                client.send(msg1); 
    
               } else {
                 Serial.println("Received not from a recognized frame"); 
