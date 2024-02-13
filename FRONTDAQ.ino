@@ -13,29 +13,31 @@
 
 //A0 is 26 A1 is 25
 
-// Button
-const int buttonPin = 25;        
-int buttonState = 0; 
+// Potentiometer Instantiations
+#define VRY_PIN  25 // ESP32 pin A1 connected to VRY pin
+int valueY = 0; // to store the Y-axis value
 
 void sendBack();
 
-// RPM 1 INSTANTIATIONS 
-int digits[5];            // int array to store the rpm value
+// RPM INSTANTIATIONS 
 int hall_pin = 13;        // digital pin 2 is the hall pin
-float total_time = 0;     // set number of hall trips for RPM reading (higher improves accuracy)
-int hall_count = 0;
+
+// RPM 2 INSTANTIATIONS 
+//int hall_pin2 = 12; 
 
 /* the variable name CAN_cfg is fixed, do not change */
 CAN_device_t CAN_cfg;
 
 // websocket set up 
-const char* ssid = "Dionna";
-const char* password = "dionnaiscool";
+const char* ssid = "Dan";
+const char* password = "muanha21";
 // this IP address is what outputted from node server.js 
-const char* websocket_server_host = "172.20.10.8";
+const char* websocket_server_host = "172.20.10.5";
 const uint16_t websocket_server_port = 8080;
-const char* msg = NULL;
-const char* msg1 = NULL;
+const char* msg = NULL;       // button/potentiometer msg 
+const char* msg1 = NULL;      // temp msg 
+const char* rpmmsg = NULL;    // RIGHT RPM MSG
+//const char* rpmmsg2 = NULL;   // LEFT RPM MSG
 
 using namespace websockets;
 
@@ -61,7 +63,7 @@ void onEventsCallback(WebsocketsEvent event, String data) {
 void setup() {
   Serial.begin(115200);
   pinMode(hall_pin, INPUT);               // make the hall pin an input
-  pinMode(buttonPin, INPUT);              // make button an input 
+  //pinMode(hall_pin2, INPUT);              // make the second hall pin another input 
   /* set CAN pins and baudrate */
   CAN_cfg.speed = CAN_SPEED_1000KBPS;
   CAN_cfg.tx_pin_id = GPIO_NUM_5;
@@ -90,8 +92,16 @@ void setup() {
 void loop() {
    CAN_frame_t rx_frame;
    
-  int buttonState = digitalRead(buttonPin); 
-  printf("Button state: %d", buttonState); 
+  valueY = analogRead(VRY_PIN);
+
+  Serial.print("y = ");
+  Serial.println(valueY);
+
+  int digity0 = valueY /1000; 
+  int digity1 = valueY /100;
+  int digity2 = (valueY / 10) % 10;
+  int digity3 = valueY % 10;
+  
   client.poll();
     if (client.available()) {
         static unsigned long lastTime = 0;
@@ -99,37 +109,68 @@ void loop() {
         if (currentTime - lastTime > 1000) {
             lastTime = currentTime;
             
-            // send button data via websocket 
-            client.send("Button State");
-            std::string strNum1 = std::to_string(buttonState);
-            msg = strNum1.c_str();
-            client.send(msg);
+            client.send("Hello"); 
+            std::string strNum0 = std::to_string(digity0); 
+            std::string strNum1 = std::to_string(digity1); 
+            std::string strNum2 = std::to_string(digity2); 
+            std::string strNum3 = std::to_string(digity3); 
+            std::string potString = strNum0+strNum1+strNum2+strNum3; 
+
+            msg = potString.c_str(); 
+            client.send(msg); 
 
             // send RIGHT RPM data via websocket 
-//            int* rpmResult = RPMCalc(); 
-//            printf("Right RPM values"); 
-//            for (int i = 0; i < 5; ++i) {
-//               printf("%d", rpmResult[i]);
-//            }
-//            int rpm1 = rpmResult[0]; 
-//            int rpm2 = rpmResult[1]; 
-//            int rpm3 = rpmResult[2]; 
-//            int rpm4 = rpmResult[3]; 
-//            int rpm5 = rpmResult[4]; 
-//            client.send("Right RPM"); 
-//            std::string rpmNum1 = std::to_string(rpm1);
-//            std::string rpmNum2 = std::to_string(rpm2);
-//            std::string rpmNum3 = std::to_string(rpm3);
-//            std::string rpmNum4 = std::to_string(rpm4);
-//            std::string rpmNum5 = std::to_string(rpm5);
-//
-//            std::string rpmString = rpmNum1+rpmNum2+rpmNum3+rpmNum4+rpmNum5; 
-//
-//            rpmmsg = rpmString.c_str(); 
-//            client.send(rpmmsg); 
+            int* rpmResult = RPMCalc(); 
+            printf("Right RPM values\n"); 
+            for (int i = 0; i < 5; ++i) {
+               printf("%d", rpmResult[i]);
+            }
+            int rpm1 = rpmResult[0]; 
+            int rpm2 = rpmResult[1]; 
+            int rpm3 = rpmResult[2]; 
+            int rpm4 = rpmResult[3]; 
+            int rpm5 = rpmResult[4]; 
+            client.send("Right RPM"); 
+            std::string rpmNum1 = std::to_string(rpm1);
+            std::string rpmNum2 = std::to_string(rpm2);
+            std::string rpmNum3 = std::to_string(rpm3);
+            std::string rpmNum4 = std::to_string(rpm4);
+            std::string rpmNum5 = std::to_string(rpm5);
+
+            std::string rpmString = rpmNum1+rpmNum2+rpmNum3+rpmNum4+rpmNum5; 
+
+            rpmmsg = rpmString.c_str(); 
+            client.send(rpmmsg); 
             
+            // free allocated memory 
+            delete[] rpmResult; 
+
+            // send LEFT RPM data via websocket 
+//            int* rpmResult2 = RPMCalc(hall_pin2); 
+//            printf("LEFT RPM values\n"); 
+//            for (int i = 0; i < 5; ++i) {
+//               printf("%d", rpmResult2[i]);
+//            }
+//            int rpmL1 = rpmResult2[0]; 
+//            int rpmL2 = rpmResult2[1]; 
+//            int rpmL3 = rpmResult2[2]; 
+//            int rpmL4 = rpmResult2[3]; 
+//            int rpmL5 = rpmResult2[4]; 
+//            client.send("Left RPM"); 
+//            std::string rpmNumL1 = std::to_string(rpmL1);
+//            std::string rpmNumL2 = std::to_string(rpmL2);
+//            std::string rpmNumL3 = std::to_string(rpmL3);
+//            std::string rpmNumL4 = std::to_string(rpmL4);
+//            std::string rpmNumL5 = std::to_string(rpmL5);
+//
+//            std::string rpmString2 = rpmNumL1+rpmNumL2+rpmNumL3+rpmNumL4+rpmNumL5; 
+//
+//            rpmmsg2 = rpmString2.c_str(); 
+//            client.send(rpmmsg2); 
+//            
 //            // free allocated memory 
-//            delete[] rpmResult; 
+//            delete[] rpmResult2; 
+            
            
             // if receive something send it back 
             if(xQueueReceive(CAN_cfg.rx_queue,&rx_frame, 3*portTICK_PERIOD_MS)==pdTRUE){
@@ -154,7 +195,7 @@ void loop() {
                 int data4 = rx_frame.data.u8[3]; 
                 int data5 = rx_frame.data.u8[4]; 
                 Serial.println("Received Data"); 
-                printf("%d%d%d%d%d%d", data1, data2, data3, data4, data5); 
+                printf("%d%d%d%d%d%d\n", data1, data2, data3, data4, data5); 
                 client.send("temp Data"); 
                 std::string strNum1 = std::to_string(data1);
                 std::string strNum2 = std::to_string(data2);               
@@ -176,7 +217,10 @@ void loop() {
 }
 
 int* RPMCalc() {
-  // start RPM sensor calculation 
+  // start RPM sensor calculation
+  int digits[5];            // int array to store the rpm value 
+  int hall_count = 0;
+  float total_time = 0;     // set number of hall trips for RPM reading (higher improves accuracy)
   int* rpm = new int[5]; 
   if(total_time > 1){
      total_time = 0;
