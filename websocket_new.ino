@@ -21,12 +21,16 @@ int hall_pin = 27;        // digital pin 2 is the hall pin
 
 // CAN INSTANTIATIONS
 CAN_device_t CAN_cfg;
-
+//
 const char* ssid = "Dionna";
 const char* password = "dionnaiscool";
 
+//const char* ssid = "esp32";
+//const char* password = "123456";
+
 // creating an AsyncWebServer object on port 80
 AsyncWebServer server(80);
+//WiFiServer server(80);
 //create a websocket object
 AsyncWebSocket ws("/ws");
 
