@@ -4,7 +4,7 @@
 #include <ESPAsyncWebServer.h>
 // spiffs makes the file system 
 #include "SPIFFS.h"
-#include <Arduino_JSON.h>
+#include <Arduino_JSON.h>   
 
 #include <ESP32CAN.h>
 #include <CAN.h>
@@ -14,10 +14,10 @@
 //TAKEN FROM https://randomnerdtutorials.com/esp32-websocket-server-sensor/
 
 // Potentiometer Instantiations
-#define VRY_PIN  25 // ESP32 pin A1 connected to VRY pin
+#define VRY_PIN  34 // ESP32 pin A2 connected to VRY pin
 
 // RPM INSTANTIATIONS 
-int hall_pin = 27;        // digital pin 2 is the hall pin
+int hall_pin = 26;        // digital pin 2 is the hall pin
 
 // CAN INSTANTIATIONS
 CAN_device_t CAN_cfg;
@@ -86,6 +86,7 @@ void CAN_initalize(){
 
 int get_joystick(){
   int valueY = 0; // to store the Y-axis value
+  delay(1000); 
   valueY = analogRead(VRY_PIN);
   return valueY; 
 }
@@ -111,33 +112,36 @@ float get_rpm() {
         on_state = true;
         hall_count+=1;
       }
+      delay(1000); 
     }
     else{
       on_state = false;
       break;
     }
-  }
   // print information about Time and RPM
   float end_time = micros();
   total_time = total_time+((end_time-start)/1000000.0);
   float rpm_val = ((float)hall_count/total_time)*60.0;
   // make the rpm value 0 if its NaN, or else prints out 2147483647
-  bool nan = isnan(rpm_val);
-  if (nan) {
-    Serial.println("RPM value is NaN");
-    rpm_val = 0;
-  }
+//  bool nan = isnan(rpm_val);
+//  if (nan) {
+//    Serial.println("RPM value is NaN");
+//    rpm_val = 0;
+//  }
   Serial.print("RPM_val: "); 
   Serial.println(rpm_val); 
-  delay(1);        // delay in between reads for stability
+  //delay(1);        // delay in between reads for stability
   return rpm_val;
  }
+}
 
 // will need left rpm eventually 
 //get sensor readings and return JSON object 
 
 String getSensorReadings(){
+  delay(1000); 
   readings["RPM"] = String(get_rpm());
+  delay(1000); 
   readings["Joystick"] = String(get_joystick());
   String jsonString = JSON.stringify(readings);
   Serial.println("JSON STRING");
